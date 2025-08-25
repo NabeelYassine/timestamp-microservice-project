@@ -1,32 +1,113 @@
 <!DOCTYPE html>
-
-<html>
-   <head>
-      <title>Timestamp Microservice | freeCodeCamp.org</title>
-      <link rel="shortcut icon" href="https://cdn.freecodecamp.org/universal/favicons/favicon-32x32.png" type="image/x-icon"/>
-      <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css">
-      <link href="style.css" rel="stylesheet" type="text/css">
-   </head>
-
-   <body>
-    <h1>Timestamp Microservice</h1>
-    <hr />
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timestamp Microservice</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+  
+</head>
+<body>
     <div class="container">
-      <h2>Example Usage:</h2>
-      <ul>
-        <li><a href="api/2015-12-25">[project url]/api/2015-12-25</a></li>
-        <li><a href="api/1451001600000">[project url]/api/1451001600000</a></li>
-      </ul>
+        <header>
+            <h1>Timestamp Microservice</h1>
+            <p class="subtitle">Convert between Unix timestamps and UTC dates</p>
+        </header>
+        
+        <div class="content">
+            <div class="card">
+                <h2><i class="fas fa-info-circle"></i> About This Service</h2>
+                <p>This API service converts dates between Unix timestamps and UTC strings. It's a solution for the FreeCodeCamp Back End Development and APIs certification project.</p>
+            </div>
+            
+            <div class="card">
+                <h2><i class="fas fa-code"></i> Try It Out</h2>
+                <p>Enter a date string or Unix timestamp to test the API:</p>
+                
+                <div class="input-area">
+                    <input type="text" id="dateInput" placeholder="Enter a date (e.g., Dec 25, 2015 or 1451001600000)">
+                    <button id="convertBtn">Convert</button>
+                </div>
+                
+                <div class="output" id="output">
+                    Results will appear here...
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2><i class="fas fa-road"></i> API Usage Examples</h2>
+                <p>Use these endpoints to get timestamp conversions:</p>
+                
+                <div class="examples">
+                    <div class="example">
+                        <h3>Valid Date String</h3>
+                        <div class="endpoint">/api/2015-12-25</div>
+                        <p>Returns: <code>{"unix":1451001600000,"utc":"Fri, 25 Dec 2015 00:00:00 GMT"}</code></p>
+                    </div>
+                    
+                    <div class="example">
+                        <h3>Unix Timestamp</h3>
+                        <div class="endpoint">/api/1451001600000</div>
+                        <p>Returns: <code>{"unix":1451001600000,"utc":"Fri, 25 Dec 2015 00:00:00 GMT"}</code></p>
+                    </div>
+                    
+                    <div class="example">
+                        <h3>Current Time</h3>
+                        <div class="endpoint">/api</div>
+                        <p>Returns the current time in both Unix and UTC format</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>&copy; 2025, Nabeel Yassine. All Rights Reserved.</p>
+            <p>Developed as part of the FreeCodeCamp Back End Development and APIs Certification</p>
+        </footer>
+    </div>
 
-      <h2>Example Output:</h2>
-      <p>
-        <code>{"unix":1451001600000, "utc":"Fri, 25 Dec 2015 00:00:00 GMT"}</code>
-      </p>
-    </div>
-    <div class="footer">
-      <p>
-        By <a href="https://www.freecodecamp.org/">freeCodeCamp.org</a>
-      </p>
-    </div>
-  </body>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dateInput = document.getElementById('dateInput');
+            const convertBtn = document.getElementById('convertBtn');
+            const output = document.getElementById('output');
+            
+            // Function to handle API calls
+            async function convertDate() {
+                const input = dateInput.value.trim();
+                let apiUrl = '/api/';
+                
+                if (input) {
+                    apiUrl += encodeURIComponent(input);
+                }
+                
+                try {
+                    const response = await fetch(apiUrl);
+                    const data = await response.json();
+                    
+                    if (data.error) {
+                        output.innerHTML = `<span style="color: #e74c3c;">Error: ${data.error}</span>`;
+                    } else {
+                        output.innerHTML = `<span style="color: #27ae60;">Valid Conversion:</span>\n\nUNIX: ${data.unix}\nUTC:  ${data.utc}`;
+                    }
+                } catch (error) {
+                    output.innerHTML = `<span style="color: #e74c3c;">Network Error: Could not connect to the API</span>`;
+                }
+            }
+            
+            // Event listeners
+            convertBtn.addEventListener('click', convertDate);
+            
+            dateInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    convertDate();
+                }
+            });
+            
+            // Example of API response for initial display
+            output.innerHTML = "Example Output:\n\nUNIX: 1451001600000\nUTC:  Fri, 25 Dec 2015 00:00:00 GMT";
+        });
+    </script>
+</body>
 </html>

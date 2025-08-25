@@ -1,32 +1,57 @@
 // index.js
-// where your node app starts
+// Timestamp Microservice - Backend Implementation
 
-// init project
-var express = require('express');
-var app = express();
+const express = require('express');
+const cors = require('cors');
+const app = express();
 
-// enable CORS (https://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
-// so that your API is remotely testable by FCC 
-var cors = require('cors');
-app.use(cors({optionsSuccessStatus: 200}));  // some legacy browsers choke on 204
+// Enable CORS for FCC testing
+app.use(cors({ optionsSuccessStatus: 200 }));
 
-// http://expressjs.com/en/starter/static-files.html
+// Serve static files
 app.use(express.static('public'));
 
-// http://expressjs.com/en/starter/basic-routing.html
-app.get("/", function (req, res) {
+// Route handler for the root endpoint
+app.get("/", (req, res) => {
   res.sendFile(__dirname + '/views/index.html');
 });
 
+// API endpoint for timestamp conversion
+app.get("/api/:date?", (req, res) => {
+  let date;
+  const inputDate = req.params.date;
 
-// your first API endpoint... 
-app.get("/api/hello", function (req, res) {
-  res.json({greeting: 'hello API'});
+  // Handle empty date parameter (current time)
+  if (!inputDate) {
+    date = new Date();
+    return res.json({
+      unix: date.getTime(),
+      utc: date.toUTCString()
+    });
+  }
+
+  // Check if input is a Unix timestamp (numeric string)
+  if (/^\d+$/.test(inputDate)) {
+    date = new Date(parseInt(inputDate));
+  } else {
+    date = new Date(inputDate);
+  }
+
+  // Validate date
+  if (isNaN(date.getTime())) {
+    return res.json({ error: "Invalid Date" });
+  }
+
+  // Return valid date response
+  res.json({
+    unix: date.getTime(),
+    utc: date.toUTCString()
+  });
 });
-
-
 
 // Listen on port set in environment variable or default to 3000
-var listener = app.listen(process.env.PORT || 3000, function () {
-  console.log('Your app is listening on port ' + listener.address().port);
+const listener = app.listen(process.env.PORT || 3000, () => {
+  console.log('Timestamp Microservice is running on port ' + listener.address().port);
 });
+
+module.exports = app; 
